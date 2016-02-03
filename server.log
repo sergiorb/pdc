@@ -1,4 +1,0 @@
-02/03/2016 07:46:10 PM ||TYPE:INFO ||FROM: My personal serial device ||MSG: Level set to 2-DEBUG
-02/03/2016 07:46:10 PM ||TYPE:INFO ||FROM: My personal serial device ||MSG: Device instance created. Route: /dev/ttyAMA0
-02/03/2016 07:46:10 PM ||TYPE:INFO ||FROM: My personal serial device ||MSG: Opening /dev/ttyAMA0...
-02/03/2016 07:46:10 PM ||TYPE:ERROR ||FROM: My personal serial device ||MSG: Could not open port. Reason: could not open port /dev/ttyAMA0: [Errno 2] No such file or directory: '/dev/ttyAMA0'
