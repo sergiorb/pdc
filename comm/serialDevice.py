@@ -2,15 +2,10 @@
 
 import threading, serial, random, time
 import logging, sys
+
 from Queue import Queue
 
-def threaded(fn):
-    def run(*args, **kwargs):
-        t = threading.Thread(target=fn, args=args, kwargs=kwargs)
-        t.start()
-        return t
-    return run
-
+from .tools import threaded
 
 class SerialDevice(threading.Thread):
 	"""
@@ -39,14 +34,14 @@ class SerialDevice(threading.Thread):
 	# Final char for detecting the final order's string.
 	STOPCHAR = ';'
 
-	def __init__(self, routeStr, baudRate=9600, timeout=10, eventHandler=None, name="Device Unknow", logLevel=0):
+	def __init__(self, routeStr, baudRate=9600, timeout=10, eventHandler=None, name="Device Unknow", logLevel=0, logfile='server.log'):
 		threading.Thread.__init__(self)
 		self.routeStr = routeStr
 		self.baudRate = baudRate
 		self.timeout = timeout
 		self.eventHandler = eventHandler
 
-		logging.basicConfig(filename='server.log', format='%(asctime)s ||TYPE:%(levelname)s ||FROM: %(name)s ||MSG: %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
+		logging.basicConfig(filename=logfile, format='%(asctime)s ||TYPE:%(levelname)s ||FROM: %(name)s ||MSG: %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
 		self.log = logging.getLogger(name)
 
 		if(logLevel==0):
@@ -65,7 +60,7 @@ class SerialDevice(threading.Thread):
 
 		self.log.info("Device instance created. Route: %s" % routeStr)
 
-	def inStringsChopper(message):
+	def inStringsChopper(self, message):
 		if(message[0] == self.INITIALCHAR and message[-1] == self.STOPCHAR):
 			idenPos = message.find(self.IDENTIFIERCHART)
 			stopPos = message.find(self.STOPCHAR)
@@ -74,7 +69,7 @@ class SerialDevice(threading.Thread):
 			try:
 				return [int(stringId), response]
 			except:
-				print "ERROR: "+stringId
+				self.log.error("ERROR: "+stringId)
 		else:
 			return None
 
@@ -101,7 +96,8 @@ class SerialDevice(threading.Thread):
 			while True:
 
 				# Sends a heart beat signal to check if device is connected and ready.
-				self.serialObj.write("%s0%s0%s" % (INITIALCHAR,DEFUSEPARATOR,STOPCHAR))
+				self.log.debug("%s0%s0%s" % (self.INITIALCHAR,self.DEFUSEPARATOR,self.STOPCHAR))
+				self.serialObj.write("%s0%s0%s" % (self.INITIALCHAR,self.DEFUSEPARATOR,self.STOPCHAR))
 				readed = self.serialObj.readline()
 				self.log.debug("Readed: "+readed)
 
@@ -133,7 +129,10 @@ class SerialDevice(threading.Thread):
 		"""
 		Close contection with device.
 		"""
-		self.stop_run()
+
+		self.log.info("Trying to close %s device" % self.routeStr)
+		self.stop()
+
 		self.serialObj.close()
 		self.ready = False
 		self.log.info("Device %s closed." % self.routeStr)
@@ -146,19 +145,25 @@ class SerialDevice(threading.Thread):
 		"""
 		Searchs for task in toSendQueue and send it to the device.
 		"""
-		while self.ready:
-			while True:
-				orderStr = self.toSendQueue.get()
-				self.log.debug("Sending Function '%s', Data: '%s' to %s." % (orderStr[2], orderStr[3], self.routeStr))
-				try:
-					self.serialObj.write(self.INITIALCHAR+str(orderStr[0])+self.IDENTIFIERCHART+str(orderStr[1])+self.DEFUSEPARATOR+str(orderStr[2])+self.DEFUSEPARATOR+str(orderStr[3])+self.STOPCHAR)
-				except IOError, e:
-					self.log.error("Couldnt send data to device.")
-				except Exception, e:
-					self.ready = False
-					self.log.error("ERROR: ")
-				finally:
-					self.toSendQueue.task_done()
+		if self.ready:
+
+			while self.runControler:
+
+				if self.toSendQueue.qsize() > 0:
+					orderStr = self.toSendQueue.get(timeout=5)
+					self.log.debug("Sending Function '%s', Data: '%s' to %s." % (orderStr[2], orderStr[3], self.routeStr))
+
+					try:
+						self.log.debug("Sending %s" % self.INITIALCHAR+str(orderStr[0])+self.IDENTIFIERCHART+str(orderStr[1])+self.DEFUSEPARATOR+str(orderStr[2])+self.DEFUSEPARATOR+str(orderStr[3])+self.STOPCHAR)
+						self.serialObj.write(self.INITIALCHAR+str(orderStr[0])+self.IDENTIFIERCHART+str(orderStr[1])+self.DEFUSEPARATOR+str(orderStr[2])+self.DEFUSEPARATOR+str(orderStr[3])+self.STOPCHAR)
+					except IOError, e:
+						self.log.error("Couldnt send data to device. %s" % e)
+					except Exception, e:
+						self.ready = False
+						self.log.error("ERROR: %s" % e)
+					finally:
+						self.toSendQueue.task_done()
+			self.log.info("Data send loop stop for device %s" % self.routeStr)
 
 	def send_data(self, device, function, data="", register=False):
 		"""
@@ -166,7 +171,8 @@ class SerialDevice(threading.Thread):
 		If register is true, the method appends the task to outputStringsPoll to
 		allow programs track if task is processed or not.
 		"""
-		if(self.ready):
+
+		if self.ready:
 			orderID = self.getOrderId()
 
 			if(register):
@@ -201,11 +207,11 @@ class SerialDevice(threading.Thread):
 						break
 		return randNumber
 
-
 	def getResponse(self, stringId):
 		"""
 		Retrieves data from processed task at inputStringsPoll.
 		"""
+
 		for x in range(0, len(self.inputStringsPoll)):
 			if(self.inputStringsPoll[x][0] == stringId):
 				data = self.inputStringsPoll[x][1]
@@ -235,11 +241,12 @@ class SerialDevice(threading.Thread):
 		string = ""
 		incomingData = False
 
-		if(self.ready):
+		if self.ready:
 
 			self.log.info("Device %s running." % self.routeStr)
 
 			while self.runControler:
+
 				try:
 					data = self.serialObj.read(1)
 				except Exception, e:
@@ -247,21 +254,24 @@ class SerialDevice(threading.Thread):
 					self.runControler = False
 					self.log.error(e)
 				
-				if(data == INITIALCHAR or incomingData == True):
+				if(data == self.INITIALCHAR or incomingData == True):
 					dataArray.append(data)
 					incomingData = True
-					if(data == STOPCHAR):
+					if(data == self.STOPCHAR):
 						incomingData = False
 						string = ''.join(dataArray)
 						dataArray = []
 						self.log.debug("Device %s send '%s'." % (self.routeStr, string))
-						self.inputStringsPoll.append(inStringsChopper(string))
+						self.inputStringsPoll.append(self.inStringsChopper(string))
 						self.log.debug("INPUTSTRINGSPOLL" + str(self.inputStringsPoll))
 
-		print ("Device %s stop running." % self.routeStr)
+			self.log.info("Device %s stop running." % self.routeStr)
+		else:
+			self.log.info("Device %snot ready" % self.routeStr)
 
-	def stop_run(self):
+	def stop(self):
 		"""
-		Stops crawler.
+		Stops device.
 		"""
+		self.log.info("Trying to stop device %s" % self.routeStr)
 		self.runControler = False
