@@ -15,6 +15,7 @@ class SerialDevice(threading.Thread):
 	routeStr = None
 	baudRate = None
 	timeout = None
+	opened = False
 	ready = False
 	serialObj = None
 	runControler = False
@@ -78,15 +79,14 @@ class SerialDevice(threading.Thread):
 			Opens the communication with serial device.
 		"""
 		self.log.info("Opening %s..." % self.routeStr)
-		opened = False
 
 		try:
 			self.serialObj = serial.Serial(self.routeStr, self.baudRate, timeout=self.timeout)
-			opened = True
+			self.opened = True
 		except serial.SerialException, e:
 			self.log.error("Could not open port. Reason: %s" % e)
 
-		if opened:
+		if self.opened:
 			# Cleans in/out on serial.
 			self.serialObj.flushInput()
 			self.serialObj.flushOutput()
@@ -133,7 +133,10 @@ class SerialDevice(threading.Thread):
 		self.log.info("Trying to close %s device" % self.routeStr)
 		self.stop()
 
-		self.serialObj.close()
+		if self.opened:
+			self.serialObj.close()
+
+		self.opened = False
 		self.ready = False
 		self.log.info("Device %s closed." % self.routeStr)
 
@@ -267,7 +270,7 @@ class SerialDevice(threading.Thread):
 
 			self.log.info("Device %s stop running." % self.routeStr)
 		else:
-			self.log.info("Device %snot ready" % self.routeStr)
+			self.log.info("Device %s not ready" % self.routeStr)
 
 	def stop(self):
 		"""
