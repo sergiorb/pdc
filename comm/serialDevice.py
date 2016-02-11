@@ -50,9 +50,6 @@ class SerialDevice(threading.Thread):
 		elif(logLevel==1):
 			self.log.setLevel(logging.WARNING)
 			self.log.info("Level set to 1-WARNING")
-		elif(logLevel==2):
-			self.log.setLevel(logging.DEBUG)
-			self.log.info("Level set to 2-DEBUG")
 		else:
 			self.log.setLevel(logging.DEBUG)
 			self.log.info("Level set to 2-DEBUG")
@@ -93,7 +90,8 @@ class SerialDevice(threading.Thread):
 
 			counter = 0
 
-			while True:
+			# Exits if tried more the 5 times or self.ready==True.
+			while not self.ready and counter<5:
 
 				# Sends a heart beat signal to check if device is connected and ready.
 				self.log.debug("%s0%s0%s" % (self.INITIALCHAR,self.DEFUSEPARATOR,self.STOPCHAR))
@@ -105,19 +103,15 @@ class SerialDevice(threading.Thread):
 				if(self.stringFilter(readed)=="ready"):
 					self.ready = True
 					self.log.info("%s opened." % self.routeStr)
-					break
 				else:
 					self.log.warning("Failed!")
 					self.log.warning("Waiting %s" % str(self.timeout))
 					time.sleep(self.timeout)
 					self.log.warning("Trying again...")
+				counter += 1
+			if counter == 5:
+				self.log.warning("Device %s opening failed!. Try to check connection and restart." % self.routeStr)
 
-					# Exits if tried more the 5 times.
-					if counter == 5:
-						self.log.warning("Device %s opening failed!. Try to check connection and restart." % self.routeStr)
-						break
-					counter += 1
-		
 
 	def is_ready(self):
 		"""
