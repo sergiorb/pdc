@@ -121,7 +121,7 @@ class SerialDevice(threading.Thread):
 
 	def close(self):
 		"""
-		Close contection with device.
+		Close connection with device.
 		"""
 
 		self.log.info("Trying to close %s device" % self.routeStr)
