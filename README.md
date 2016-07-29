@@ -31,6 +31,7 @@ $ unzip master.zip
 Now, install dependencies wit make. Make calls virtualenv to create an isolated enviroment for python and install the project dependencies with pip3
 
 ```
+$ cd PDC/
 $ make
 ```
 
