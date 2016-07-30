@@ -1,11 +1,11 @@
-# PDC v1.0
+# PDC v1.1
 
 PDC or Python Device Connection is a library to facilitate data exchange between physical devices like Arduino
 with programs written in Python. I use it with my own IOT-alike projects (aquarium automatization for example) and I share it just with the purpose of learning and sharing with the community. 
 
 ## Getting Started
 
-At the moment, there is only a serial device and a Arduino client in the library. In the future I would like to write other kind of devices such Wireless or ethernet ones.
+At the moment, there is only a serial device and a Arduino client in the library. In the future I would like to write other kind of devices such as Wireless or Ethernet ones.
 
 ### Prerequisities
 
@@ -13,6 +13,8 @@ You need:
 * [Arduino](https://www.arduino.cc/) Board (I use the Arduino UNO model), loaded with the code that you can find on ```clients/arduino/arduino_uno_v*.*.ino```. To do so, just follow this guide [https://www.arduino.cc/en/Guide/Linux](https://www.arduino.cc/en/Guide/Linux).
 
 * USB cable (A plug to B plug).
+
+* Python 3 installed on your system.
 
 * virtualenv installed on your system.
 
@@ -28,7 +30,7 @@ $ wget https://github.com/sergiorb/PDC/archive/master.zip
 $ unzip master.zip
 ```
 
-Now, install dependencies wit make. Make calls virtualenv to create an isolated enviroment for python and install the project dependencies with pip3
+Now, install dependencies with Make. It calls virtualenv to create an isolated enviroment for python and install the project dependencies with pip3.
 
 ```
 $ make
@@ -46,7 +48,7 @@ If everything is correct, the program should say ```Device response: Hi [name th
 
 ## Running the tests
 
-To run automatic test, use make:
+To run automatic test, use Make:
 
 ```
 $ make test
