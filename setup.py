@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
   name = "pdc",
-  version = "1.1.6",
+  version = "1.1.7",
   packages = find_packages(),
   install_requires = ['pyserial>=3.0.1'],
   package_data = {
@@ -16,5 +16,5 @@ setup(
   license = "MIT",
   keywords = "arduino serial communication",
   url = "https://github.com/sergiorb/pdc",
-  download_url = 'https://github.com/sergiorb/pdc/tarball/1.1.6'
+  download_url = 'https://github.com/sergiorb/pdc/tarball/1.1.7'
 )
