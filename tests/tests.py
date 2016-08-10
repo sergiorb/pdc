@@ -1,6 +1,6 @@
 import unittest, time
 
-from pdc.serial.serial import SerialDevice
+from pdc.pdc.serial.serial import SerialDevice
 
 class TestPDC(unittest.TestCase):
 
