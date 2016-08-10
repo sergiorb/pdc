@@ -8,7 +8,7 @@ setup(
   author = 'Sergio Romero Barra',
   author_email = 's.romerobarra@gmail.com',
   url = 'https://github.com/sergiorb/pdc',
-  download_url = 'https://github.com/sergiorb/sypi/tarball/1.1.2',
+  download_url = 'https://github.com/sergiorb/pdc/tarball/1.1.2',
   keywords = ['arduino', 'serial', 'communication'],
   classifiers = [],
 )

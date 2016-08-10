@@ -1,4 +1,4 @@
-# PDC v1.1.1
+# PDC v1.1.2
 
 PDC or Python Device Connection is a library to facilitate data exchange between physical devices like Arduino
 with programs written in Python. I use it with my own IOT-alike projects (aquarium automatization for example) and I share it just with the purpose of learning and sharing with the community. 
@@ -28,6 +28,12 @@ $ git clone https://github.com/sergiorb/PDC.git
 ```
 $ wget https://github.com/sergiorb/PDC/archive/master.zip
 $ unzip master.zip
+```
+
+Using pip:
+
+```
+pip install pdc
 ```
 
 Now, install dependencies with Make. It calls virtualenv to create an isolated enviroment for python and install the project dependencies with pip3.
