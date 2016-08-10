@@ -2,4 +2,4 @@
 *.log
 pdc_env/
 dist/
-MANIFEST
+*.egg-info
