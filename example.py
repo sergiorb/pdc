@@ -3,7 +3,7 @@
 
 import time
 
-from pdc.serial.serial import SerialDevice
+from pdc.pdc.serial.serial import SerialDevice
 
 print("PDC example.")
 serial_device = SerialDevice(route_str='/dev/ttyACM0')

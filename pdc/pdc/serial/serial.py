@@ -3,8 +3,8 @@
 
 import serial, random, time, os, multiprocessing
 
-from pdc import utils as pdc_utils
-from pdc.serial import comm_protocol as cfg
+from pdc.pdc import utils as pdc_utils
+from pdc.pdc.serial import comm_protocol as cfg
 
 class SerialDevice():
 
