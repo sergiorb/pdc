@@ -1,5 +1,7 @@
 # PDC v1.1.7
 
+[![PyPI version](https://badge.fury.io/py/pdc.svg)](https://badge.fury.io/py/pdc)
+
 PDC or Python Device Connection is a library to facilitate data exchange between physical devices like Arduino
 with programs written in Python. I use it with my own IOT-alike projects (aquarium automatization for example) and I share it just with the purpose of learning and sharing with the community. 
 
